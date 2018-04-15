@@ -3,9 +3,9 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using Thorium_Config;
+using Thorium.Config;
 
-namespace Thorium_Net
+namespace Thorium.Net
 {
     public class HttpServiceInvokationReceiver : IServiceInvokationReceiver
     {

@@ -6,10 +6,10 @@ using System.Net.Sockets;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using NLog;
-using Thorium_Config;
-using Thorium_Threading;
+using Thorium.Config;
+using Thorium.Threading;
 
-namespace Thorium_Net
+namespace Thorium.Net
 {
     public class TCPServiceInvokationReceiver : IServiceInvokationReceiver
     {

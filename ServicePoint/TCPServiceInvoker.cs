@@ -3,7 +3,7 @@ using System.IO;
 using System.Net.Sockets;
 using Newtonsoft.Json.Linq;
 
-namespace Thorium_Net
+namespace Thorium.Net
 {
     public class TCPServiceInvoker : IServiceInvoker, IDisposable
     {

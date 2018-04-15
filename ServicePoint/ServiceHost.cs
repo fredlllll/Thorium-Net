@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using NLog;
-using Thorium_Config;
-using Thorium_Reflection;
+using Thorium.Config;
+using Thorium.Reflection;
 
-namespace Thorium_Net
+namespace Thorium.Net
 {
     public class ServiceHost
     {

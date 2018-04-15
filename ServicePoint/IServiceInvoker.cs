@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Thorium_Net
+namespace Thorium.Net
 {
     public interface IServiceInvoker
     {

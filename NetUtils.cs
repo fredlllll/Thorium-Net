@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Thorium_Net
+namespace Thorium.Net
 {
     public static class NetUtils
     {
