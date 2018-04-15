@@ -33,15 +33,15 @@
   <ItemGroup>
     <Compile Include="NetUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServicePoint\HttpServiceInvokationReceiver.cs" />
-    <Compile Include="ServicePoint\HttpServiceInvoker.cs" />
-    <Compile Include="ServicePoint\InvokationResult.cs" />
-    <Compile Include="ServicePoint\IServiceInvokationReceiver.cs" />
-    <Compile Include="ServicePoint\IServiceInvoker.cs" />
-    <Compile Include="ServicePoint\Routine.cs" />
-    <Compile Include="ServicePoint\ServiceHost.cs" />
-    <Compile Include="ServicePoint\TCPServiceInvokationReceiver.cs" />
-    <Compile Include="ServicePoint\TCPServiceInvoker.cs" />
+    <Compile Include="WebService\HttpServiceInvokationReceiver.cs" />
+    <Compile Include="WebService\HttpServiceInvoker.cs" />
+    <Compile Include="WebService\InvokationResult.cs" />
+    <Compile Include="WebService\IServiceInvokationReceiver.cs" />
+    <Compile Include="WebService\IServiceInvoker.cs" />
+    <Compile Include="WebService\Routine.cs" />
+    <Compile Include="WebService\ServiceHost.cs" />
+    <Compile Include="WebService\TCPServiceInvokationReceiver.cs" />
+    <Compile Include="WebService\TCPServiceInvoker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
