@@ -9,10 +9,17 @@ namespace Thorium.Net
     {
         private WebClient wc = new WebClient();
         private string host;
+        private int port;
 
-        public HttpServiceInvoker(string host)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="host">for example localhost</param>
+        /// <param name="port">for example 80</param>
+        public HttpServiceInvoker(string host, int port = 80)
         {
             this.host = host;
+            this.port = port;
         }
 
         private string ToB64(string str)
@@ -22,7 +29,7 @@ namespace Thorium.Net
 
         public JToken Invoke(string routine, JToken arg)
         {
-            UriBuilder ub = new UriBuilder("http", host)
+            UriBuilder ub = new UriBuilder("http", host, port)
             {
                 Query = "routine=" + ToB64(routine) + "&arg=" + ToB64(arg.ToString(Newtonsoft.Json.Formatting.None))
             };
