@@ -17,7 +17,7 @@ namespace Thorium.Net
 
         public HttpServiceInvokationReceiver(string configName)
         {
-            var c = ConfigFile.GetConfig(configName);
+            dynamic c = ConfigFile.GetConfig(configName);
 
             port = c.Port;
         }

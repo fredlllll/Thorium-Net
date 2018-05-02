@@ -21,7 +21,7 @@ namespace Thorium.Net
 
         public TCPServiceInvokationReceiver(string configName)
         {
-            var config = ConfigFile.GetConfig(configName);
+            dynamic config = ConfigFile.GetConfig(configName);
 
             listener = new TcpListener(IPAddress.Any, config.Port);
         }

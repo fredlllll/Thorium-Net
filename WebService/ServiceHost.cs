@@ -26,71 +26,75 @@ namespace Thorium.Net
             if(configName != null)
             {
                 var config = ConfigFile.GetConfig(configName);
-                JArray invokationReceivers = config.InvokationReceivers;
-                foreach(var val in invokationReceivers)
+                if(config.TryGet<JArray>("invokationReceivers", out JArray invokationReceivers))
                 {
-                    if(val is JObject jo && jo.Get("load", false))
+                    foreach(var val in invokationReceivers)
                     {
-                        var type = jo.Get<string>("type");
+                        if(val is JObject jo && jo.Get("load", false))
+                        {
+                            var type = jo.Get<string>("type");
 
-                        Type t = ReflectionHelper.GetType(type);
-                        if(t == null)
-                        {
-                            logger.Warn("Couldn't find type: " + type);
-                            continue;
-                        }
-                        ConstructorInfo ci = null;
-                        ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { typeof(string) }, null);
-                        if(ci != null)
-                        {
-                            AddFromConstructor(ci, new object[] { jo.Get<string>("args") });
-                        }
-                        else
-                        {
-                            ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
-                            if(ci == null)
+                            Type t = ReflectionHelper.GetType(type);
+                            if(t == null)
                             {
-                                logger.Warn("Couldn't find constructor for " + t.AssemblyQualifiedName + ". Provide either a default constructor or one that takes a string argument");
+                                logger.Warn("Couldn't find type: " + type);
                                 continue;
                             }
-                            AddFromConstructor(ci, new object[0]);
+                            ConstructorInfo ci = null;
+                            ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { typeof(string) }, null);
+                            if(ci != null)
+                            {
+                                AddFromConstructor(ci, new object[] { jo.Get<string>("config") });
+                            }
+                            else
+                            {
+                                ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+                                if(ci == null)
+                                {
+                                    logger.Warn("Couldn't find constructor for " + t.AssemblyQualifiedName + ". Provide either a default constructor or one that takes a string argument");
+                                    continue;
+                                }
+                                AddFromConstructor(ci, new object[0]);
+                            }
                         }
                     }
                 }
 
-                JArray routineHandlers = config.RoutineHandlers;
-                foreach(var val in routineHandlers)
+                if(config.TryGet<JArray>("routineHandlers", out JArray routineHandlers))
                 {
-                    if(val is JObject jo && jo.Get("load", false))
+                    foreach(var val in routineHandlers)
                     {
-                        var name = jo.Get<string>("name");
-                        var handler = jo.Get<string>("handler");
-
-                        int lastDot = handler.LastIndexOf('.');
-                        string typeName = handler.Substring(0, lastDot);
-                        string methodName = handler.Substring(lastDot + 1);
-                        Type type = ReflectionHelper.GetType(typeName);
-
-                        if(type == null)
+                        if(val is JObject jo && jo.Get("load", false))
                         {
-                            logger.Warn("Couldn't find type: " + typeName);
-                            continue;
-                        }
+                            var name = jo.Get<string>("name");
+                            var handler = jo.Get<string>("handler");
 
-                        MethodInfo mi = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { typeof(JToken) }, null);
-                        if(mi == null)
-                        {
-                            logger.Warn("Couldn't find suitable method " + methodName + " that takes a JToken");
-                            continue;
+                            int lastDot = handler.LastIndexOf('.');
+                            string typeName = handler.Substring(0, lastDot);
+                            string methodName = handler.Substring(lastDot + 1);
+                            Type type = ReflectionHelper.GetType(typeName);
+
+                            if(type == null)
+                            {
+                                logger.Warn("Couldn't find type: " + typeName);
+                                continue;
+                            }
+
+                            MethodInfo mi = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { typeof(JToken) }, null);
+                            if(mi == null)
+                            {
+                                logger.Warn("Couldn't find suitable method " + methodName + " that takes a JToken");
+                                continue;
+                            }
+                            if(!mi.ReturnType.Equals(typeof(JToken)))
+                            {
+                                logger.Warn("The routine handler " + methodName + " has to return JToken");
+                                continue;
+                            }
+                            RoutineHandler routineHandler = (RoutineHandler)Delegate.CreateDelegate(typeof(RoutineHandler), mi);
+                            Routine routine = new Routine(name, routineHandler);
+                            RegisterRoutine(routine);
                         }
-                        if(!mi.ReturnType.Equals(typeof(JToken)))
-                        {
-                            logger.Warn("The routine handler " + methodName + " has to return JToken");
-                            continue;
-                        }
-                        RoutineHandler routineHandler = (RoutineHandler)Delegate.CreateDelegate(typeof(RoutineHandler), mi);
-                        Routine routine = new Routine(name, routineHandler);
-                        RegisterRoutine(routine);
                     }
                 }
             }
