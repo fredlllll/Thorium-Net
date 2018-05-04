@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using NLog;
 using Thorium.Config;
 using Thorium.Reflection;
 
-namespace Thorium.Net
+namespace Thorium.Net.ServiceHost
 {
     public class ServiceHost
     {
@@ -15,7 +16,9 @@ namespace Thorium.Net
         private bool started = false;
 
         private readonly Dictionary<string, Routine> routines = new Dictionary<string, Routine>();
+        public IReadOnlyList<string> RoutineNames { get { return routines.Select((kv) => kv.Key).ToList(); } }
         private readonly List<IServiceInvokationReceiver> invokationReceivers = new List<IServiceInvokationReceiver>();
+        public IReadOnlyList<IServiceInvokationReceiver> InvokationReceivers { get { return invokationReceivers; } }
 
         /// <summary>
         /// 

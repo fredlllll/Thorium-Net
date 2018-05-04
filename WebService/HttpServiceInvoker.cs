@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace Thorium.Net
+namespace Thorium.Net.ServiceHost
 {
     public class HttpServiceInvoker : IServiceInvoker
     {
@@ -20,6 +20,13 @@ namespace Thorium.Net
         {
             this.host = host;
             this.port = port;
+        }
+
+        public HttpServiceInvoker(Config.Config config)
+        {
+            dynamic c = config;
+            port = c.Port;
+            host = c.Host;
         }
 
         private string ToB64(string str)

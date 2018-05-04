@@ -3,7 +3,7 @@ using System.IO;
 using System.Net.Sockets;
 using Newtonsoft.Json.Linq;
 
-namespace Thorium.Net
+namespace Thorium.Net.ServiceHost
 {
     public class TCPServiceInvoker : IServiceInvoker, IDisposable
     {
@@ -19,10 +19,15 @@ namespace Thorium.Net
             reader = new BinaryReader(client.GetStream());
         }
 
-        public TCPServiceInvoker(string host, int port) : this(new TcpClient(host, port))
-        {
+        public TCPServiceInvoker(string host, int port) : this(new TcpClient(host, port)) { }
 
+        static TcpClient ConfigToTcpClient(Config.Config config)
+        {
+            dynamic c = config;
+            return new TcpClient(c.Host, c.Port);
         }
+
+        public TCPServiceInvoker(Config.Config config) : this(ConfigToTcpClient(config)) { }
 
         public JToken Invoke(string routine, JToken arg)
         {

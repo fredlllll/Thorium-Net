@@ -5,28 +5,26 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Thorium.Config;
 
-namespace Thorium.Net
+namespace Thorium.Net.ServiceHost
 {
-    public class HttpServiceInvokationReceiver : IServiceInvokationReceiver
+    [CompatibleInvoker(typeof(HttpServiceInvoker))]
+    public class HttpServiceInvokationReceiver : ServiceInvokationReceiver
     {
         HttpListener listener;
 
         private int port;
 
-        public event InvokationHandler InvokationReceived;
-
-        public HttpServiceInvokationReceiver(string configName)
+        public HttpServiceInvokationReceiver(Config.Config config) : base(config)
         {
-            dynamic c = ConfigFile.GetConfig(configName);
-
+            dynamic c = config;
             port = c.Port;
         }
 
-        public void Start()
+        public HttpServiceInvokationReceiver(string configName) : this(ConfigFile.GetConfig(configName)) { }
+
+        public override void Start()
         {
             listener = new HttpListener();
-
-
 
             listener.Prefixes.Add(string.Format("http://*:{0}/", port));
 
@@ -34,7 +32,7 @@ namespace Thorium.Net
             listener.BeginGetContext(GetContext, null);
         }
 
-        public void Stop()
+        public override void Stop()
         {
             listener.Stop();
             listener = null;
@@ -58,7 +56,7 @@ namespace Thorium.Net
                     arg = FromB64(context.Request.QueryString["arg"]);
                 }
                 catch { }
-                var result = InvokationReceived?.Invoke(this, routine, JToken.Parse(arg));
+                var result = RaiseInvokationReceived(routine, JToken.Parse(arg));
 
                 context.Response.ContentType = "application/json";
 

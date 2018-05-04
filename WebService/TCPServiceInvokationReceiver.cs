@@ -9,30 +9,30 @@ using NLog;
 using Thorium.Config;
 using Thorium.Threading;
 
-namespace Thorium.Net
+namespace Thorium.Net.ServiceHost
 {
-    public class TCPServiceInvokationReceiver : IServiceInvokationReceiver
+    [CompatibleInvoker(typeof(TCPServiceInvoker))]
+    public class TCPServiceInvokationReceiver : ServiceInvokationReceiver
     {
-        public event InvokationHandler InvokationReceived;
-
         ConcurrentList<Receiver> clients = new ConcurrentList<Receiver>();
 
         TcpListener listener;
 
-        public TCPServiceInvokationReceiver(string configName)
+        public TCPServiceInvokationReceiver(Config.Config config) : base(config)
         {
-            dynamic config = ConfigFile.GetConfig(configName);
-
-            listener = new TcpListener(IPAddress.Any, config.Port);
+            dynamic c = config;
+            listener = new TcpListener(IPAddress.Any, c.Port);
         }
 
-        public void Start()
+        public TCPServiceInvokationReceiver(string configName) : this(ConfigFile.GetConfig(configName)) { }
+
+        public override void Start()
         {
             listener.Start();
             listener.BeginAcceptTcpClient(AcceptClient, null);
         }
 
-        public void Stop()
+        public override void Stop()
         {
             listener.Stop();
 
@@ -51,11 +51,6 @@ namespace Thorium.Net
             receiver.Start();
 
             clients.Add(receiver);
-        }
-
-        InvokationResult RaiseInvokation(string routine, JToken arg)
-        {
-            return InvokationReceived?.Invoke(this, routine, arg);
         }
 
         void RemoveReceiver(Receiver receiver)
@@ -98,7 +93,7 @@ namespace Thorium.Net
                                 arg = JToken.Parse(argString);
                             }
 
-                            InvokationResult result = receiver.RaiseInvokation(routine, arg);
+                            InvokationResult result = receiver.RaiseInvokationReceived(routine, arg);
                             if(result.Exception != null) //exception
                             {
                                 writer.Write((byte)0);

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Thorium.Net
+namespace Thorium.Net.ServiceHost
 {
     public delegate JToken RoutineHandler(JToken arg);
 

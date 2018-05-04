@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 
-namespace Thorium.Net
+namespace Thorium.Net.ServiceHost
 {
     public class InvokationResult
     {
