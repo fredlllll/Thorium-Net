@@ -34,16 +34,16 @@
     <Compile Include="NetUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceHost\CompatibleInvokerAttribute.cs" />
-    <Compile Include="ServiceHost\HttpServiceInvokationReceiver.cs" />
-    <Compile Include="ServiceHost\HttpServiceInvoker.cs" />
+    <Compile Include="ServiceHost\Interfaces\HttpServiceInvokationReceiver.cs" />
+    <Compile Include="ServiceHost\Interfaces\HttpServiceInvoker.cs" />
     <Compile Include="ServiceHost\InvokationResult.cs" />
     <Compile Include="ServiceHost\IServiceInvokationReceiver.cs" />
     <Compile Include="ServiceHost\IServiceInvoker.cs" />
     <Compile Include="ServiceHost\Routine.cs" />
     <Compile Include="ServiceHost\ServiceHost.cs" />
     <Compile Include="ServiceHost\ServiceInvokationReceiver.cs" />
-    <Compile Include="ServiceHost\TCPServiceInvokationReceiver.cs" />
-    <Compile Include="ServiceHost\TCPServiceInvoker.cs" />
+    <Compile Include="ServiceHost\Interfaces\TCPServiceInvokationReceiver.cs" />
+    <Compile Include="ServiceHost\Interfaces\TCPServiceInvoker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

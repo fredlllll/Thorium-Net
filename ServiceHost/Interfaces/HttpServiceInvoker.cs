@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace Thorium.Net.ServiceHost
+namespace Thorium.Net.ServiceHost.Interfaces
 {
     public class HttpServiceInvoker : IServiceInvoker
     {

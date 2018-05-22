@@ -9,7 +9,7 @@ using NLog;
 using Thorium.Config;
 using Thorium.Threading;
 
-namespace Thorium.Net.ServiceHost
+namespace Thorium.Net.ServiceHost.Interfaces
 {
     [CompatibleInvoker(typeof(TCPServiceInvoker))]
     public class TCPServiceInvokationReceiver : ServiceInvokationReceiver

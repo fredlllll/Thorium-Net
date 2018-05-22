@@ -5,7 +5,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Thorium.Config;
 
-namespace Thorium.Net.ServiceHost
+namespace Thorium.Net.ServiceHost.Interfaces
 {
     [CompatibleInvoker(typeof(HttpServiceInvoker))]
     public class HttpServiceInvokationReceiver : ServiceInvokationReceiver
