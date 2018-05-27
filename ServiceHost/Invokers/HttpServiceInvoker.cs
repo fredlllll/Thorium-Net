@@ -3,9 +3,9 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace Thorium.Net.ServiceHost.Interfaces
+namespace Thorium.Net.ServiceHost.Invokers
 {
-    public class HttpServiceInvoker : IServiceInvoker
+    public class HttpServiceInvoker : IInvoker
     {
         private WebClient wc = new WebClient();
         private string host;

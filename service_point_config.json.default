@@ -7,11 +7,11 @@
       "config": "the name of the config the invokation receiver should load (if there is a contructor taking a string)"
     }
   ],
-  "routineHandlers": [
+  "invokationHandlers": [
     {
       "load": false,
-      "name": "ping",
-      "handler": "Namespace.Type.StaticMethodName"
+      "type": "Namespace.ChildOfIInvokationHandler",
+      "config": "the name of the config the invokation receiver should load (if there is a contructor taking a string)"
     }
   ]
 }

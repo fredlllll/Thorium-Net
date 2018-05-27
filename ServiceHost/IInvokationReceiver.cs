@@ -2,9 +2,9 @@
 
 namespace Thorium.Net.ServiceHost
 {
-    public delegate InvokationResult InvokationHandler(IServiceInvokationReceiver sender, string routine, JToken arg);
+    public delegate InvokationResult InvokationHandler(IInvokationReceiver sender, string routine, JToken arg);
 
-    public interface IServiceInvokationReceiver
+    public interface IInvokationReceiver
     {
         event InvokationHandler InvokationReceived;
 

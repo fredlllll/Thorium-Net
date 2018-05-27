@@ -4,11 +4,12 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Thorium.Config;
+using Thorium.Net.ServiceHost.Invokers;
 
-namespace Thorium.Net.ServiceHost.Interfaces
+namespace Thorium.Net.ServiceHost.InvokationReceivers
 {
     [CompatibleInvoker(typeof(HttpServiceInvoker))]
-    public class HttpServiceInvokationReceiver : ServiceInvokationReceiver
+    public class HttpServiceInvokationReceiver : InvokationReceiver
     {
         HttpListener listener;
 

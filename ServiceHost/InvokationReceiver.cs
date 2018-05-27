@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace Thorium.Net.ServiceHost
 {
-    public abstract class ServiceInvokationReceiver : IServiceInvokationReceiver
+    public abstract class InvokationReceiver : IInvokationReceiver
     {
         public Config.Config Configuration { get; protected set; }
 
@@ -18,7 +13,7 @@ namespace Thorium.Net.ServiceHost
             return InvokationReceived?.Invoke(this, routine, arg);
         }
 
-        public ServiceInvokationReceiver(Config.Config configuration)
+        public InvokationReceiver(Config.Config configuration)
         {
             Configuration = configuration;
         }

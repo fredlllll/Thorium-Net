@@ -15,10 +15,9 @@ namespace Thorium.Net.ServiceHost
 
         private bool started = false;
 
-        private readonly Dictionary<string, Routine> routines = new Dictionary<string, Routine>();
-        public IReadOnlyList<string> RoutineNames { get { return routines.Select((kv) => kv.Key).ToList(); } }
-        private readonly List<IServiceInvokationReceiver> invokationReceivers = new List<IServiceInvokationReceiver>();
-        public IReadOnlyList<IServiceInvokationReceiver> InvokationReceivers { get { return invokationReceivers; } }
+        private readonly List<IInvokationHandler> invokationHandlers = new List<IInvokationHandler>();
+        private readonly List<IInvokationReceiver> invokationReceivers = new List<IInvokationReceiver>();
+        public IReadOnlyList<IInvokationReceiver> InvokationReceivers { get { return invokationReceivers; } }
 
         /// <summary>
         /// 
@@ -35,68 +34,65 @@ namespace Thorium.Net.ServiceHost
                     {
                         if(val is JObject jo && jo.Get("load", false))
                         {
-                            var type = jo.Get<string>("type");
+                            var receiverType = jo.Get<string>("type");
 
-                            Type t = ReflectionHelper.GetType(type);
-                            if(t == null)
+                            Type type = ReflectionHelper.GetType(receiverType);
+                            if(type == null)
                             {
-                                logger.Warn("Couldn't find type: " + type);
+                                logger.Warn("Couldn't find type: " + receiverType);
                                 continue;
                             }
                             ConstructorInfo ci = null;
-                            ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { typeof(string) }, null);
+                            ci = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { typeof(string) }, null);
                             if(ci != null)
                             {
-                                AddFromConstructor(ci, new object[] { jo.Get<string>("config") });
+                                AddInvokationReceiverFromConstructor(ci, new object[] { jo.Get<string>("config") });
                             }
                             else
                             {
-                                ci = t.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+                                ci = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
                                 if(ci == null)
                                 {
-                                    logger.Warn("Couldn't find constructor for " + t.AssemblyQualifiedName + ". Provide either a default constructor or one that takes a string argument");
+                                    logger.Warn("Couldn't find constructor for " + type.AssemblyQualifiedName + ". Provide either a default constructor or one that takes a string argument");
                                     continue;
                                 }
-                                AddFromConstructor(ci, new object[0]);
+                                AddInvokationReceiverFromConstructor(ci, new object[0]);
                             }
                         }
                     }
                 }
 
-                if(config.TryGet<JArray>("routineHandlers", out JArray routineHandlers))
+                if(config.TryGet<JArray>("invokationHandlers", out JArray routineHandlers))
                 {
                     foreach(var val in routineHandlers)
                     {
                         if(val is JObject jo && jo.Get("load", false))
                         {
-                            var name = jo.Get<string>("name");
-                            var handler = jo.Get<string>("handler");
-
-                            int lastDot = handler.LastIndexOf('.');
-                            string typeName = handler.Substring(0, lastDot);
-                            string methodName = handler.Substring(lastDot + 1);
-                            Type type = ReflectionHelper.GetType(typeName);
+                            var handlerType = jo.Get<string>("type");
+                            Type type = ReflectionHelper.GetType(handlerType);
 
                             if(type == null)
                             {
-                                logger.Warn("Couldn't find type: " + typeName);
+                                logger.Warn("Couldn't find type: " + handlerType);
                                 continue;
                             }
 
-                            MethodInfo mi = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public, null, new Type[] { typeof(JToken) }, null);
-                            if(mi == null)
+                            ConstructorInfo ci = null;
+                            ci = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[] { typeof(string) }, null);
+                            if(ci != null)
                             {
-                                logger.Warn("Couldn't find suitable method " + methodName + " that takes a JToken");
-                                continue;
+                                AddInvokationHandlerFromConstructor(ci, new object[] { jo.Get<string>("config") });
                             }
-                            if(!mi.ReturnType.Equals(typeof(JToken)))
+                            else
                             {
-                                logger.Warn("The routine handler " + methodName + " has to return JToken");
-                                continue;
+                                ci = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+                                if(ci == null)
+                                {
+                                    logger.Warn("Couldn't find constructor for " + type.AssemblyQualifiedName + ". Provide either a default constructor or one that takes a string argument");
+                                    continue;
+                                }
+                                AddInvokationHandlerFromConstructor(ci, new object[0]);
                             }
-                            RoutineHandler routineHandler = (RoutineHandler)Delegate.CreateDelegate(typeof(RoutineHandler), mi);
-                            Routine routine = new Routine(name, routineHandler);
-                            RegisterRoutine(routine);
                         }
                     }
                 }
@@ -108,23 +104,49 @@ namespace Thorium.Net.ServiceHost
         /// </summary>
         /// <param name="ci">the constructor to invoke</param>
         /// <param name="args">the arguments</param>
-        private void AddFromConstructor(ConstructorInfo ci, object[] args)
+        private void AddInvokationReceiverFromConstructor(ConstructorInfo ci, object[] args)
         {
             try
             {
                 object obj = ci.Invoke(args);
-                if(obj is IServiceInvokationReceiver sir)
+                if(obj is IInvokationReceiver sir)
                 {
                     RegisterInvokationReceiver(sir);
                 }
                 else
                 {
-                    logger.Warn(ci.ReflectedType.AssemblyQualifiedName + " Is not a " + nameof(IServiceInvokationReceiver));
+                    logger.Warn(ci.ReflectedType.AssemblyQualifiedName + " Is not a " + nameof(IInvokationReceiver));
                 }
             }
             catch(TargetInvocationException ex)
             {
                 logger.Error("Error thrown when creating service invokation receiver: " + ci.ReflectedType.AssemblyQualifiedName);
+                logger.Error(ex);
+            }
+        }
+
+        /// <summary>
+        /// creates an instance if possible and adds it. will not add on error and only write log information
+        /// </summary>
+        /// <param name="ci">the constructor to invoke</param>
+        /// <param name="args">the arguments</param>
+        private void AddInvokationHandlerFromConstructor(ConstructorInfo ci, object[] args)
+        {
+            try
+            {
+                object obj = ci.Invoke(args);
+                if(obj is IInvokationHandler ih)
+                {
+                    RegisterInvokationHandler(ih);
+                }
+                else
+                {
+                    logger.Warn(ci.ReflectedType.AssemblyQualifiedName + " Is not a " + nameof(IInvokationHandler));
+                }
+            }
+            catch(TargetInvocationException ex)
+            {
+                logger.Error("Error thrown when creating service invokation handler: " + ci.ReflectedType.AssemblyQualifiedName);
                 logger.Error(ex);
             }
         }
@@ -140,17 +162,12 @@ namespace Thorium.Net.ServiceHost
             }
         }
 
-        public void RegisterRoutine(Routine routine)
+        public void RegisterInvokationHandler(IInvokationHandler handler)
         {
-            RequireNotStarted();
-            if(routines.ContainsKey(routine.Name))
-            {
-                throw new ArgumentException("There is already a routine named '" + routine.Name + "' registered");
-            }
-            routines[routine.Name] = routine;
+            invokationHandlers.Add(handler);
         }
 
-        public void RegisterInvokationReceiver(IServiceInvokationReceiver si)
+        public void RegisterInvokationReceiver(IInvokationReceiver si)
         {
             invokationReceivers.Add(si);
         }
@@ -183,18 +200,24 @@ namespace Thorium.Net.ServiceHost
             }
         }
 
-        private InvokationResult HandleInvokationReceived(IServiceInvokationReceiver sender, string routine, JToken arg)
+        private InvokationResult HandleInvokationReceived(IInvokationReceiver sender, string routine, JToken arg)
         {
-            if(routines.TryGetValue(routine, out Routine r))
+            for(int i = 0; i < invokationHandlers.Count; i++)
             {
-                try
+                var handler = invokationHandlers[i];
+                if(handler.HasRoutine(routine))
                 {
-                    JToken retval = r.Invoke(arg);
-                    return new InvokationResult() { ReturnValue = retval };
-                }
-                catch(Exception ex)
-                {
-                    return new InvokationResult() { Exception = ex };
+
+                    try
+                    {
+                        JToken retval = handler.HandleInvokation(routine, arg);
+                        return new InvokationResult() { ReturnValue = retval };
+                    }
+                    catch(Exception ex)
+                    {
+                        return new InvokationResult() { Exception = ex };
+                    }
+
                 }
             }
             return new InvokationResult() { Exception = new Exception("No routine named '" + routine + "' registered") };

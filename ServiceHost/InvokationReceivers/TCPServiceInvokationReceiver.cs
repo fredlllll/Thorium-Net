@@ -7,12 +7,13 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using NLog;
 using Thorium.Config;
+using Thorium.Net.ServiceHost.Invokers;
 using Thorium.Threading;
 
-namespace Thorium.Net.ServiceHost.Interfaces
+namespace Thorium.Net.ServiceHost.InvokationReceivers
 {
     [CompatibleInvoker(typeof(TCPServiceInvoker))]
-    public class TCPServiceInvokationReceiver : ServiceInvokationReceiver
+    public class TCPServiceInvokationReceiver : InvokationReceiver
     {
         ConcurrentList<Receiver> clients = new ConcurrentList<Receiver>();
 
