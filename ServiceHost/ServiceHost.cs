@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using NLog;
 using Thorium.Config;

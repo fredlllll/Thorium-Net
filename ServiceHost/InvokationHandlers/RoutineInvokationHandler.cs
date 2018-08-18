@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using NLog;
-using Thorium.IO;
 using Thorium.Reflection;
 
 namespace Thorium.Net.ServiceHost.InvokationHandlers
