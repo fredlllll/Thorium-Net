@@ -22,7 +22,8 @@ namespace Thorium.Net.ServiceHost.InvokationReceivers
         public TCPServiceInvokationReceiver(Config.Config config) : base(config)
         {
             dynamic c = config;
-            listener = new TcpListener(IPAddress.Any, c.Port);
+            int port = c.Port;
+            listener = new TcpListener(IPAddress.Any, port);
         }
 
         public TCPServiceInvokationReceiver(string configName) : this(ConfigFile.GetConfig(configName)) { }
