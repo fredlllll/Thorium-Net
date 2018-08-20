@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Thorium-IO\Thorium.IO.csproj" />
     <ProjectReference Include="..\Thorium-Reflection\Thorium.Reflection.csproj" />
     <ProjectReference Include="..\Thorium-Threading\Thorium.Threading.csproj" />
+    <ProjectReference Include="..\Thorium-Utils\Thorium.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
