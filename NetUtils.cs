@@ -7,6 +7,10 @@ namespace Thorium.Net
         //TODO: this isnt optimal, but works for now...
         public static string GetExternalIP()
         {
+            return "127.0.0.1";
+
+            //why the hell does the remote host close the connection??
+            /*
             WebClient wc = new WebClient();
 
             string response = wc.DownloadString("http://checkip.dyndns.org");
@@ -16,6 +20,7 @@ namespace Thorium.Net
             string[] splitByTagStart = secondPartTrimmed.Split('<');
             string ip = splitByTagStart[0];
             return ip;
+            */
         }
     }
 }
